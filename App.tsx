@@ -22,3 +22,4 @@ export default function App() {
 }
 
 // Aula 1: #missaoespacial
+// Aula 2: #embuscadoproximonivel
