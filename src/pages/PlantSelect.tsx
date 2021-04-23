@@ -30,10 +30,26 @@ interface PlantsProps {
 export function PlantSelect() {
   const [environments, setEnvironments] = useState<EnvironmentProps[]>([])
   const [plants, setPlants] = useState<PlantsProps[]>([])
+  const [filteredPlants, setFilteredPlants] = useState<PlantsProps[]>([])
+  const [environmentSelected, setEnvironmentSelected] = useState('all')
+
+  function handleEnvironmentSelected(environment: string) {
+    setEnvironmentSelected(environment)
+
+    if (environment === 'all') return setFilteredPlants(plants)
+
+    const filtered = plants.filter((plant) =>
+      plant.environments.includes(environment)
+    )
+
+    setFilteredPlants(filtered)
+  }
 
   useEffect(() => {
     async function fetchEnvironment() {
-      const { data } = await api.get<EnvironmentProps[]>('plants_environments')
+      const { data } = await api.get<EnvironmentProps[]>(
+        'plants_environments?_sort=title&_order=asc'
+      )
       setEnvironments([{ key: 'all', title: 'Todos' }, ...data])
     }
 
@@ -46,8 +62,11 @@ export function PlantSelect() {
 
   useEffect(() => {
     async function fetchPlants() {
-      const { data } = await api.get<PlantsProps[]>('plants')
+      const { data } = await api.get<PlantsProps[]>(
+        'plants?_sort=name&_order=asc'
+      )
       setPlants(data)
+      setFilteredPlants(data)
     }
 
     fetchPlants()
@@ -56,6 +75,10 @@ export function PlantSelect() {
       setPlants([])
     }
   }, [])
+
+  useEffect(() => {
+    console.log(environmentSelected)
+  }, [environmentSelected])
 
   return (
     <View style={styles.container}>
@@ -70,7 +93,11 @@ export function PlantSelect() {
         <FlatList
           data={environments}
           renderItem={({ item }) => (
-            <EnvironmentButton key={item.key} title={item.title} />
+            <EnvironmentButton
+              title={item.title}
+              active={item.key == environmentSelected}
+              onPress={() => handleEnvironmentSelected(item.key)}
+            />
           )}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -81,7 +108,7 @@ export function PlantSelect() {
 
       <View style={styles.plants}>
         <FlatList
-          data={plants}
+          data={filteredPlants}
           renderItem={({ item }) => (
             <PlantCardPrimary key={item.id} data={item} />
           )}
