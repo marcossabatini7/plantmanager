@@ -37,7 +37,9 @@ export function UserIdentification() {
   }
 
   function handleSubmit() {
-    if (name && name.length >= 3) navigation.navigate('Confirmation')
+    // if (name && name.length >= 3)
+    //   navigation.navigate('Confirmation')
+    navigation.navigate('Confirmation')
   }
 
   return (
