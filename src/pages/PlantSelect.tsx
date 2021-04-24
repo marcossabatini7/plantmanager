@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, FlatList } from 'react-native'
+import { View, Text, StyleSheet, FlatList, Platform } from 'react-native'
 import { EnvironmentButton } from '../components/EnvironmentButton'
 
 import { Header } from '../components/Header'
 import { PlantCardPrimary } from '../components/PlantCardPrimary'
+import { Load } from '../components/Load'
+
 import api from '../services/api'
 
 import colors from '../styles/colors'
@@ -32,6 +34,7 @@ export function PlantSelect() {
   const [plants, setPlants] = useState<PlantsProps[]>([])
   const [filteredPlants, setFilteredPlants] = useState<PlantsProps[]>([])
   const [environmentSelected, setEnvironmentSelected] = useState('all')
+  const [loading, setLoading] = useState(true)
 
   function handleEnvironmentSelected(environment: string) {
     setEnvironmentSelected(environment)
@@ -67,6 +70,7 @@ export function PlantSelect() {
       )
       setPlants(data)
       setFilteredPlants(data)
+      setLoading(false)
     }
 
     fetchPlants()
@@ -79,6 +83,8 @@ export function PlantSelect() {
   useEffect(() => {
     console.log(environmentSelected)
   }, [environmentSelected])
+
+  if (loading && Platform.OS !== 'web') return <Load />
 
   return (
     <View style={styles.container}>
