@@ -17,11 +17,12 @@ import { useNavigation, useRoute } from '@react-navigation/core'
 import DateTimePicker, { Event } from '@react-native-community/datetimepicker'
 import { format, isBefore } from 'date-fns'
 
-import { loadPlants, PlantProps, savePlant } from '../libs/storage'
+import { PlantProps, savePlant } from '../libs/storage'
 
 import { Button } from '../components/Button'
 
 import waterDrop from '../assets/waterdrop.png'
+
 import colors from '../styles/colors'
 import fonts from '../styles/fonts'
 
@@ -58,9 +59,6 @@ export function PlantSave() {
   }
 
   async function handleSave() {
-    const data = await loadPlants()
-    console.log(data)
-
     navigation.navigate('Confirmation', {
       title: 'Tudo certo',
       subtitle:
