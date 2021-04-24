@@ -6,6 +6,7 @@ import { formatDistance } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 import { Header } from '../components/Header'
+import { PlantCardSecondary } from '../components/PlantCardSecondary'
 import { loadPlants, PlantProps } from '../libs/storage'
 
 import waterDrop from '../assets/waterdrop.png'
@@ -63,7 +64,7 @@ export function MyPlants() {
         <FlatList
           data={myPlants}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={() => <Text>Elemento</Text>}
+          renderItem={({ item }) => <PlantCardSecondary data={item} />}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flex: 1 }}
         ></FlatList>
@@ -98,7 +99,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.blue,
     padding: 20,
-    textAlign: 'justify',
   },
   plants: {
     flex: 1,
