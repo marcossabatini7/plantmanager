@@ -20,6 +20,3 @@ export default function App() {
 
   return <Routes />
 }
-
-// Aula 1: #missaoespacial
-// Aula 2: #embuscadoproximonivel
