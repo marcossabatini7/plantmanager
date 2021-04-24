@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, Platform } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Platform,
+  ActivityIndicator,
+} from 'react-native'
 import { EnvironmentButton } from '../components/EnvironmentButton'
 
 import { Header } from '../components/Header'
@@ -36,6 +43,28 @@ export function PlantSelect() {
   const [environmentSelected, setEnvironmentSelected] = useState('all')
   const [loading, setLoading] = useState(true)
 
+  const [page, setPage] = useState(1)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [loadedAll, setLoadedAll] = useState(false)
+
+  async function fetchPlants() {
+    const { data } = await api.get<PlantsProps[]>(
+      `plants?_sort=name&_order=asc&_page=${page}&_limit=6`
+    )
+
+    if (!data) return setLoading(true)
+    if (page > 1) {
+      setPlants((oldValue) => [...oldValue, ...data])
+      setFilteredPlants((oldValue) => [...oldValue, ...data])
+    } else {
+      setPlants(data)
+      setFilteredPlants(data)
+    }
+
+    setLoading(false)
+    setLoadingMore(false)
+  }
+
   function handleEnvironmentSelected(environment: string) {
     setEnvironmentSelected(environment)
 
@@ -46,6 +75,15 @@ export function PlantSelect() {
     )
 
     setFilteredPlants(filtered)
+  }
+
+  async function handleFetchMore(distance: number) {
+    //  rolando para cima, logo não precisa de carregamento
+    if (distance < 1) return
+
+    setLoadingMore(true)
+    setPage((oldValue) => oldValue + 1)
+    await fetchPlants()
   }
 
   useEffect(() => {
@@ -64,25 +102,12 @@ export function PlantSelect() {
   }, [])
 
   useEffect(() => {
-    async function fetchPlants() {
-      const { data } = await api.get<PlantsProps[]>(
-        'plants?_sort=name&_order=asc'
-      )
-      setPlants(data)
-      setFilteredPlants(data)
-      setLoading(false)
-    }
-
     fetchPlants()
 
     return () => {
       setPlants([])
     }
   }, [])
-
-  useEffect(() => {
-    console.log(environmentSelected)
-  }, [environmentSelected])
 
   if (loading && Platform.OS !== 'web') return <Load />
 
@@ -121,6 +146,13 @@ export function PlantSelect() {
           showsVerticalScrollIndicator={false}
           numColumns={2}
           keyExtractor={(item) => item.id.toString()}
+          onEndReachedThreshold={0.1} //  Distância faltando 10% para o fim da página
+          onEndReached={({ distanceFromEnd }) =>
+            handleFetchMore(distanceFromEnd)
+          }
+          ListFooterComponent={
+            loadingMore ? <ActivityIndicator color={colors.green} /> : <></>
+          }
         ></FlatList>
       </View>
     </View>
