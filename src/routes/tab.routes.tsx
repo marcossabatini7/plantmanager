@@ -7,6 +7,7 @@ import { PlantSelect } from '../pages/PlantSelect'
 import { MyPlants } from '../pages/MyPlants'
 
 import colors from '../styles/colors'
+import { Platform } from 'react-native'
 
 const { Navigator, Screen } = createBottomTabNavigator()
 
@@ -17,7 +18,7 @@ const AuthRoutes = () => {
         activeTintColor: colors.green,
         inactiveTintColor: colors.heading,
         labelPosition: 'beside-icon',
-        style: { height: 88 },
+        style: { padding: Platform.OS === 'ios' ? 20 : 0, height: 88 },
       }}
     >
       <Screen
