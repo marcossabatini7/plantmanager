@@ -8,7 +8,7 @@ import { ptBR } from 'date-fns/locale'
 import { Header } from '../components/Header'
 import { PlantCardSecondary } from '../components/PlantCardSecondary'
 import { Load } from '../components/Load'
-import { loadPlants, PlantProps } from '../libs/storage'
+import { loadPlants, PlantProps, removePlant } from '../libs/storage'
 
 import waterDrop from '../assets/waterdrop.png'
 
@@ -19,6 +19,30 @@ export function MyPlants() {
   const [myPlants, setMyPlants] = useState<PlantProps[]>([])
   const [loading, setLoading] = useState(true)
   const [nextWaterd, setNextWaterd] = useState<string>()
+
+  function handleRemove(plant: PlantProps) {
+    Alert.alert('Remover', `Deseja remover a ${plant.name}?`, [
+      {
+        text: 'Não 🙏',
+        style: 'cancel',
+      },
+      {
+        text: 'Sim 😢',
+        onPress: async () => {
+          try {
+            await removePlant(plant.id)
+
+            setMyPlants((oldData) =>
+              oldData.filter((item) => item.id !== plant.id)
+            )
+          } catch (error) {
+            Alert.alert('Não foi possível remover 😢')
+          }
+        },
+        style: 'default',
+      },
+    ])
+  }
 
   useEffect(() => {
     async function loadStorageData() {
@@ -67,7 +91,12 @@ export function MyPlants() {
         <FlatList
           data={myPlants}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <PlantCardSecondary data={item} />}
+          renderItem={({ item }) => (
+            <PlantCardSecondary
+              data={item}
+              handleRemove={() => handleRemove(item)}
+            />
+          )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flex: 1 }}
         ></FlatList>
